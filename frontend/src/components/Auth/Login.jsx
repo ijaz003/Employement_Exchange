@@ -49,9 +49,9 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignIn = (role) => {
-    window.open(`http://localhost:4000/api/v1/user/auth/google?role=${role}`, '_self');
-  };
+  // const handleGoogleSignIn = (role) => {
+  //   window.open(`http://localhost:4000/api/v1/user/auth/google?role=${role}`, '_self');
+  // };
 
   return (
     <>
