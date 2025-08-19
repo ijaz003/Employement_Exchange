@@ -92,11 +92,11 @@ const BuyPlan = () => {
       // eslint-disable-next-line
     }, [isAuthorized, user, navigate]);
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-blue-950 dark:via-gray-900 dark:to-gray-800 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Choose Your Plan</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <h1 className="text-3xl font-bold text-blue-700 dark:text-blue-300">Choose Your Plan</h1>
+          <p className="text-blue-700 dark:text-blue-300 mt-2">
             Select the plan that best fits your needs and unlock premium features.
           </p>
         </div>
@@ -104,25 +104,25 @@ const BuyPlan = () => {
           {plans.map((plan, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col justify-between"
+              className="bg-white dark:bg-blue-950 rounded-lg shadow-lg p-6 flex flex-col justify-between border border-blue-100 dark:border-blue-900"
             >
               <div>
-                <h2 className="text-xl font-bold text-primary-600 dark:text-primary-300 mb-2">{plan.title}</h2>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">{plan.description}</p>
+                <h2 className="text-xl font-bold text-blue-700 dark:text-blue-300 mb-2">{plan.title}</h2>
+                <p className="text-blue-700 dark:text-blue-300 mb-4">{plan.description}</p>
                 <div className="mb-4">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
-                  <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">/ {plan.duration}</span>
+                  <span className="text-2xl font-bold text-blue-700 dark:text-blue-200">{plan.price}</span>
+                  <span className="ml-2 text-sm text-blue-500 dark:text-blue-400">/ {plan.duration}</span>
                 </div>
                 <ul className="space-y-2 mb-6">
                   {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center text-gray-700 dark:text-gray-300">
-                      <FiCheckCircle className="text-primary-600 dark:text-primary-400 mr-2" />
+                    <li key={i} className="flex items-center text-blue-700 dark:text-blue-300">
+                      <FiCheckCircle className="text-blue-600 dark:text-blue-400 mr-2" />
                       {feature}
                     </li>
                   ))}
                 </ul>
               </div>
-              <button onClick={plan.title === "Monthly Plan" ? handleMonthlyPlan : handleYearlyPlan} className="w-full px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold shadow">
+              <button onClick={plan.title === "Monthly Plan" ? handleMonthlyPlan : handleYearlyPlan} className="w-full px-6 py-2 bg-blue-700 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-700 transition-colors font-semibold shadow">
                 Buy Now
               </button>
             </div>

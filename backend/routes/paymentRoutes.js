@@ -8,6 +8,6 @@ import { isAuthenticated } from "../middlewares/auth.js";
 const router=express.Router();
 
 router.post("/create-checkout-session",isAuthenticated, CheckoutSession);
-router.get("/verify-payment/:session_id", isAuthenticated, VerifyPayment);
+router.get("/verify-payment", isAuthenticated, VerifyPayment);
 
 export default router;

@@ -38,19 +38,6 @@ const userSchema = new mongoose.Schema({
     type:String,
     default:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQADjfoADAlJPrsl_hiiOMeE-FBor-i6hEAVg&s",
   },
-  // plan: {
-  //   type: String,
-  //   enum: ["free", "monthly", "yearly"],
-  //   default: "free"
-  // },
-  // planExpiry: {
-  //   type: Date,
-  //   default: null
-  // },
-  // isPremium: {
-  //   type: Boolean,
-  //   default: false
-  // },
   session_id: {
     type: String,
     default: null

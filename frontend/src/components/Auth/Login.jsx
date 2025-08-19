@@ -48,6 +48,7 @@ const Login = () => {
       );
       toast.success(data.message);
       dispatch(setUser(data.user));
+      
       dispatch(setIsAuthorized(true));
       navigate("/");
     } catch (error) {

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-// import { updateProfile } from "../../store/UserReducers";
+import axios from "axios";
+import { updateProfile } from "../../store/UserReducers";
 import { useTheme } from "../../contexts/ThemeContext";
-import { FiUser, FiMail, FiPhone, FiMapPin, FiBriefcase, FiEdit2, FiSave, FiX } from "react-icons/fi";
+import { FiUser, FiPhone, FiMapPin, FiBriefcase, FiEdit2, FiSave, FiX } from "react-icons/fi";
 import toast from "react-hot-toast";
 
 const Profile = () => {
@@ -12,30 +13,20 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
-    location: "",
-    bio: "",
-    skills: "",
-    experience: "",
-    education: "",
-    company: "",
-    website: "",
+    avator: "",
+    role: "",
+    session_id: ""
   });
 
   useEffect(() => {
     if (user) {
       setFormData({
         name: user.name || "",
-        email: user.email || "",
         phone: user.phone || "",
-        location: user.location || "",
-        bio: user.bio || "",
-        skills: user.skills || "",
-        experience: user.experience || "",
-        education: user.education || "",
-        company: user.company || "",
-        website: user.website || "",
+        avator: user.avator || "",
+        role: user.role || "",
+        session_id: user.session_id || ""
       });
     }
   }, [user]);
@@ -51,28 +42,33 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Here you would typically make an API call to update the profile
-      // For now, we'll just dispatch to Redux
-      dispatch(updateProfile({ ...user, ...formData }));
+      const payload = {
+        name: formData.name,
+        phone: formData.phone,
+        avator: formData.avator,
+        role: formData.role,
+        session_id: formData.session_id
+      };
+      const { data } = await axios.patch(
+        "http://localhost:4000/auth/update",
+        payload,
+        { withCredentials: true }
+      );
+      dispatch(updateProfile(data.user));
       toast.success("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
-      toast.error("Failed to update profile");
+      toast.error(error.response?.data?.message || "Failed to update profile");
     }
   };
 
   const handleCancel = () => {
     setFormData({
       name: user.name || "",
-      email: user.email || "",
       phone: user.phone || "",
-      location: user.location || "",
-      bio: user.bio || "",
-      skills: user.skills || "",
-      experience: user.experience || "",
-      education: user.education || "",
-      company: user.company || "",
-      website: user.website || "",
+      avator: user.avator || "",
+      role: user.role || "",
+      session_id: user.session_id || ""
     });
     setIsEditing(false);
   };
@@ -136,20 +132,6 @@ const Profile = () => {
                     type="text"
                     name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
                     onChange={handleInputChange}
                     disabled={!isEditing}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"

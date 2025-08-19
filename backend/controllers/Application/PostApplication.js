@@ -3,7 +3,6 @@ import { Job } from "../../models/jobSchema.js";
 // import cloudinary from "cloudinary";
 import cloudinary from "../../utils/cloudinary.js";
 
-
 const postApplication = async (req, res) => {
 
   try{
@@ -88,6 +87,5 @@ const postApplication = async (req, res) => {
     });
   }
 };
-
 
 export default postApplication;

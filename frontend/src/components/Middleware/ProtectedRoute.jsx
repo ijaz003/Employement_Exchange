@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
       const sessionId = params.get('session_id') || user?.session_id;
       let url = 'http://localhost:4000/payment/verify-payment';
       if (sessionId) {
-        url += `/${sessionId}`;
+        url += `?session_id=${sessionId}`;
       }
       fetch(url, {
         credentials: 'include'

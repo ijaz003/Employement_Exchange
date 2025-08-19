@@ -6,6 +6,7 @@ import logout from "../controllers/Auth/Logout.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 import passport from "passport";
 import jwt from "jsonwebtoken";
+import { updateUserProfile } from "../controllers/Auth/UpdateUserProfile.js";
 
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", isAuthenticated, logout);
 router.get("/getuser", isAuthenticated, getUser);
+router.patch("/update", isAuthenticated, updateUserProfile);
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile','email'] }));
 router.get('/auth/google/callback',

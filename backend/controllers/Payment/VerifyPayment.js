@@ -11,7 +11,7 @@ const VerifyPayment = async (req, res) => {
 
         if (req.params.session_id) {
             // Update user with session_id if provided
-            await User.updateOne({ _id: userId }, { session_id: req.params.session_id });
+            await User.updateOne({ _id: userId }, { session_id: req.query.session_id });
             sessionId = req.params.session_id;
         } else {
             const user = await User.findById(userId);
