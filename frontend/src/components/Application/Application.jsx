@@ -15,7 +15,6 @@ const Application = () => {
   const { isAuthorized, user } = useSelector((state) => state.user);
   const navigate = useNavigate();
 
-  // Function to handle file input changes
   const handleFileChange = (event) => {
     const resume = event.target.files[0];
     setResume(resume);
@@ -25,6 +24,12 @@ const Application = () => {
 
   const handleApplication = async (e) => {
     e.preventDefault();
+
+    if (!name || !email || !phone || !address || !coverLetter || !resume) {
+      toast.error("Please fill in all fields and attach your resume");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", email);
@@ -64,54 +69,87 @@ const Application = () => {
   }
 
   return (
-    <section className="application">
-      <div className="container">
-        <h3>Application Form</h3>
-        <form onSubmit={handleApplication}>
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            type="email"
-            placeholder="Your Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Your Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Your Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-          <textarea
-            placeholder="CoverLetter..."
-            value={coverLetter}
-            onChange={(e) => setCoverLetter(e.target.value)}
-          />
-          <div>
-            <label
-              style={{ textAlign: "start", display: "block", fontSize: "20px" }}
-            >
-              Select Resume
-            </label>
-            <input
-              type="file"
-              accept=".pdf, .jpg, .png"
-              onChange={handleFileChange}
-              style={{ width: "100%" }}
-            />
-          </div>
-          <button type="submit">Send Application</button>
-        </form>
+    <section className="py-16">
+      <div className="mx-auto max-w-3xl px-6">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <h2 className="text-2xl font-semibold text-center mb-6">Application Form</h2>
+
+          <form onSubmit={handleApplication} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-slate-700">Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-md border-2 border-slate-200 px-3 py-2 focus:outline-none focus:border-sky-500"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-slate-700">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-md border-2 border-slate-200 px-3 py-2 focus:outline-none focus:border-sky-500"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-slate-700">Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="Your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full rounded-md border-2 border-slate-200 px-3 py-2 focus:outline-none focus:border-sky-500"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-slate-700">Address</label>
+                <input
+                  type="text"
+                  placeholder="Your address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full rounded-md border-2 border-slate-200 px-3 py-2 focus:outline-none focus:border-sky-500"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-slate-700">Cover Letter</label>
+              <textarea
+                placeholder="Tell us why you are a great fit for this role."
+                value={coverLetter}
+                onChange={(e) => setCoverLetter(e.target.value)}
+                className="w-full rounded-md border-2 border-slate-200 px-3 py-2 focus:outline-none focus:border-sky-500"
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-slate-700">Upload Resume</label>
+              <input
+                type="file"
+                accept=".pdf, .jpg, .png"
+                onChange={handleFileChange}
+                className="w-full rounded-md border-2 border-slate-200 px-3 py-2 focus:outline-none focus:border-sky-500"
+                required
+              />
+            </div>
+
+            <button type="submit" className="w-full inline-flex items-center justify-center px-4 py-2 rounded-md bg-sky-600 text-white hover:bg-sky-700">Send Application</button>
+          </form>
+        </div>
       </div>
     </section>
   );

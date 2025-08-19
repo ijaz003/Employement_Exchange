@@ -61,48 +61,58 @@ const MyApplications = () => {
     setModalOpen(false);
   };
 
+  const isEmployer = user && user.role === "Employer";
+
   return (
-    <section className="my_applications page">
-      {user && user.role === "Job Seeker" ? (
-        <div className="container">
-          <center>
-            <h1>My Applications</h1>
-          </center>
-          {applications.length <= 0 ? (
-            <center>
-              <h4>No Applications Found</h4>
-            </center>
-          ) : (
-            applications.map((element) => (
-              <JobSeekerCard
-                element={element}
-                key={element._id}
-                deleteApplication={deleteApplication}
-                openModal={openModal}
-              />
-            ))
-          )}
+    <section className="py-16">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-slate-900">{isEmployer ? "Applicants" : "My Applications"}</h2>
+          <p className="mt-2 text-slate-600">{isEmployer ? "Review applicants and their resumes" : "Track your applications and statuses"}</p>
         </div>
-      ) : (
-        <div className="container">
-          <center>
-            <h1>Applications From Job Seekers</h1>
-          </center>
-          {applications.length <= 0 ? (
-            <center>
-              <h4>No Applications Found</h4>
-            </center>
-          ) : (
-            applications.map((element) => (
-              <EmployerCard
-                element={element}
-                key={element._id}
-                openModal={openModal}
-              />
-            ))
-          )}
-        </div>
-      )}
+
+        {applications.length <= 0 ? (
+          <div className="text-center py-24">
+            <h3 className="text-xl font-semibold text-slate-700">No applications found</h3>
+            <p className="mt-2 text-slate-500">{isEmployer ? "No one has applied yet." : "You haven't applied to any jobs yet."}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6">
+            {applications.map((element) => (
+              <div className="rounded-xl border border-slate-100 bg-white shadow-sm" key={element._id}>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-1">
+                      <p><strong>Name:</strong> {element.name}</p>
+                      <p><strong>Email:</strong> {element.email}</p>
+                      <p><strong>Phone:</strong> {element.phone}</p>
+                      <p><strong>Address:</strong> {element.address}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p><strong>Cover Letter:</strong></p>
+                      <p className="text-slate-600">{element.coverLetter}</p>
+                    </div>
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <img
+                        src={element.resume.url}
+                        alt="resume"
+                        style={{ maxWidth: '200px', borderRadius: '8px', cursor: 'zoom-in' }}
+                        onClick={() => openModal(element.resume.url)}
+                      />
+                      {!isEmployer && (
+                        <button className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-rose-600 text-white hover:bg-rose-700" onClick={() => deleteApplication(element._id)}>
+                          Delete Application
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {modalOpen && (
         <ResumeModal imageUrl={resumeImageUrl} onClose={closeModal} />
       )}
@@ -111,70 +121,3 @@ const MyApplications = () => {
 };
 
 export default MyApplications;
-
-const JobSeekerCard = ({ element, deleteApplication, openModal }) => {
-  return (
-    <div className="job_seeker_card">
-      <div className="detail">
-        <p>
-          <span>Name:</span> {element.name}
-        </p>
-        <p>
-          <span>Email:</span> {element.email}
-        </p>
-        <p>
-          <span>Phone:</span> {element.phone}
-        </p>
-        <p>
-          <span>Address:</span> {element.address}
-        </p>
-        <p>
-          <span>CoverLetter:</span> {element.coverLetter}
-        </p>
-      </div>
-      <div className="resume">
-        <img
-          src={element.resume.url}
-          alt="resume"
-          onClick={() => openModal(element.resume.url)}
-        />
-      </div>
-      <div className="btn_area">
-        <button onClick={() => deleteApplication(element._id)}>
-          Delete Application
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const EmployerCard = ({ element, openModal }) => {
-  return (
-    <div className="job_seeker_card">
-      <div className="detail">
-        <p>
-          <span>Name:</span> {element.name}
-        </p>
-        <p>
-          <span>Email:</span> {element.email}
-        </p>
-        <p>
-          <span>Phone:</span> {element.phone}
-        </p>
-        <p>
-          <span>Address:</span> {element.address}
-        </p>
-        <p>
-          <span>CoverLetter:</span> {element.coverLetter}
-        </p>
-      </div>
-      <div className="resume">
-        <img
-          src={element.resume.url}
-          alt="resume"
-          onClick={() => openModal(element.resume.url)}
-        />
-      </div>
-    </div>
-  );
-};

@@ -6,14 +6,12 @@ import PopularCompanies from "./PopularCompanies";
 
 const Home = () => {
   return (
-    <>
-      <section className="homePage page">
-        <HeroSection />
-        <HowItWorks />
-        <PopularCategories />
-        <PopularCompanies />
-      </section>
-    </>
+    <main>
+      <HeroSection />
+      <HowItWorks />
+      <PopularCategories />
+      <PopularCompanies />
+    </main>
   );
 };
 

@@ -2,6 +2,7 @@ import { User } from "../../models/userSchema.js";
 import { sendToken } from "../../utils/jwtToken.js";
 import bcrypt from "bcrypt";
 
+
  const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;

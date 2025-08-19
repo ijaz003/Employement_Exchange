@@ -33,7 +33,7 @@ const PopularCategories = () => {
     {
       id: 4,
       title: "MERN STACK Development",
-      subTitle: "1000+ Open Postions",
+      subTitle: "1000+ Open Positions",
       icon: <FaReact />,
     },
     {
@@ -61,23 +61,30 @@ const PopularCategories = () => {
       icon: <IoGameController />,
     },
   ];
+
   return (
-    <div className="categories">
-      <h3>POPULAR CATEGORIES</h3>
-      <div className="banner">
-        {categories.map((element) => {
-          return (
-            <div className="card" key={element.id}>
-              <div className="icon">{element.icon}</div>
-              <div className="text">
-                <p>{element.title}</p>
-                <p>{element.subTitle}</p>
+    <section className="py-16">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-slate-900">Popular Job Categories</h2>
+          <p className="mt-2 text-slate-600">Explore opportunities in trending fields and industries</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map((category) => (
+            <div className="flex items-center gap-4 rounded-xl border border-slate-100 bg-white p-6 shadow-sm hover:shadow-lg transition" key={category.id}>
+              <div className="w-14 h-14 flex items-center justify-center rounded-lg bg-sky-100 text-sky-600 text-2xl">
+                {category.icon}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-slate-900">{category.title}</h3>
+                <p className="text-sm font-medium text-slate-600">{category.subTitle}</p>
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

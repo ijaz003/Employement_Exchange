@@ -1,134 +1,294 @@
-import React, { useEffect, useState } from "react";
-import { MdOutlineMailOutline } from "react-icons/md";
-import { RiLock2Fill } from "react-icons/ri";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaRegUser } from "react-icons/fa";
-import axios from "axios";
-import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsAuthorized, setUser } from "../../store/UserReducers.js";
+import {   setIsAuthorized, setUser } from "../../store/UserReducers";
+import { useTheme } from "../../contexts/ThemeContext";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiHome, FiBriefcase } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    role: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isLoading,setIsLoading]=useState(false);
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthorized, user } = useSelector((state) => state.user);
+  const { isDark } = useTheme();
+  const { isAuthorized } = useSelector((state) => state.user);
 
-  useEffect(() => {
-    if (isAuthorized) {
-      navigate("/");
-    }
-    // eslint-disable-next-line
-  }, [isAuthorized, navigate]);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData)
+    setIsLoading(true);
     try {
       const { data } = await axios.post(
         "http://localhost:4000/auth/login",
-        { email, password, role },
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json", 
           },
           withCredentials: true,
         }
       );
       toast.success(data.message);
-      setEmail("");
-      setPassword("");
-      setRole("");
       dispatch(setUser(data.user));
       dispatch(setIsAuthorized(true));
       navigate("/");
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
       dispatch(setIsAuthorized(false));
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // const handleGoogleSignIn = (role) => {
-  //   window.open(`http://localhost:4000/api/v1/user/auth/google?role=${role}`, '_self');
-  // };
+  useEffect(() => {
+    if (isAuthorized) {
+      toast.success("Login successful!");
+      navigate("/");
+    }
+  }, [isAuthorized, navigate]);
+
+
+  const handleGoogleLogin = async () => {
+    if (!formData.role) {
+      toast.error("Please select a role first");
+      return;
+    }
+    
+    setIsGoogleLoading(true);
+    try {
+    } catch (error) {
+      toast.error("Google login failed");
+      setIsGoogleLoading(false);
+    }
+  };
 
   return (
-    <>
-      <section className="authPage">
-        <div className="container">
-          <div className="header">
-            <img src="/careerconnect-black.png" alt="logo" />
-            <h3>Login to your account</h3>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <div className="flex justify-center">
+            <img
+              src={isDark ? "/careerconnect-white.png" : "/careerconnect-black.png"}
+              alt="CareerConnect"
+              className="h-12 w-auto"
+            />
           </div>
-          <form>
-            <div className="inputTag">
-              <label>Login As</label>
-              <div>
-                <select value={role} onChange={(e) => setRole(e.target.value)}>
-                  <option value="">Select Role</option>
-                  <option value="Job Seeker">Job Seeker</option>
-                  <option value="Employer">Employer</option>
-                </select>
-                <FaRegUser />
-              </div>
-            </div>
-            <div className="inputTag">
-              <label>Email Address</label>
-              <div>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <MdOutlineMailOutline />
-              </div>
-            </div>
-            <div className="inputTag">
-              <label>Password</label>
-              <div>
-                <input
-                  type="password"
-                  placeholder="Enter your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <RiLock2Fill />
-              </div>
-            </div>
-            <button type="submit" onClick={handleLogin}>
-              Login
+          <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
+            Welcome back
+          </h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Sign in to your account to continue
+          </p>
+        </div>
+
+        {/* Role Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            I am a...
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, role: "Job Seeker" }))}
+              className={`p-3 border-2 rounded-lg flex items-center justify-center space-x-2 transition-colors ${
+                formData.role === "Job Seeker"
+                  ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300"
+                  : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-primary-400 dark:hover:border-primary-500"
+              }`}
+            >
+              <FiBriefcase className="h-5 w-5" />
+              <span className="font-medium">Job Seeker</span>
             </button>
             <button
               type="button"
-              onClick={() => handleGoogleSignIn(role)}
-              style={{
-                marginTop: "10px",
-                background: "#fff",
-                color: "#333",
-                border: "1px solid #ccc",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
+              onClick={() => setFormData(prev => ({ ...prev, role: "Employer" }))}
+              className={`p-3 border-2 rounded-lg flex items-center justify-center space-x-2 transition-colors ${
+                formData.role === "Employer"
+                  ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300"
+                  : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-primary-400 dark:hover:border-primary-500"
+              }`}
             >
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png"
-                alt="Google"
-                style={{ width: "20px", height: "20px" }}
-              />
-              Sign In with Google
+              <FiHome className="h-5 w-5" />
+              <span className="font-medium">Employer</span>
             </button>
-            <Link to={"/register"}>Register Now</Link>
-          </form>
+          </div>
         </div>
-        <div className="banner">
-          <img src="/login.png" alt="login" />
+
+        {/* Google OAuth Button */}
+        <div className="space-y-4">
+          <button
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading || !formData.role}
+            className="w-full flex items-center justify-center space-x-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGoogleLoading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
+            ) : (
+              <FcGoogle className="h-5 w-5" />
+            )}
+            <span className="font-medium">
+              {isGoogleLoading ? "Signing in..." : "Continue with Google"}
+            </span>
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+                Or continue with email
+              </span>
+            </div>
+          </div>
         </div>
-      </section>
-    </>
+
+        {/* Login Form */}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Email address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiMail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                  placeholder="Enter your email"
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiLock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Remember Me & Forgot Password */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                Remember me
+              </label>
+            </div>
+            <div className="text-sm">
+              <a href="#" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 transition-colors">
+                Forgot password?
+              </a>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign in</span>
+                  <FiArrowRight className="h-5 w-5" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Sign Up Link */}
+          <div className="text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Don&apos;t have an account?{" "}
+              <Link
+                to="/register"
+                className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 transition-colors"
+              >
+                Sign up here
+              </Link>
+            </p>
+          </div>
+        </form>
+
+        {/* Additional Info */}
+        <div className="text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            By signing in, you agree to our{" "}
+            <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">
+              Privacy Policy
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
