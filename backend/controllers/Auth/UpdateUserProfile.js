@@ -4,7 +4,8 @@ export const updateUserProfile = async (req, res) => {
   try {
     const userId = req.user._id;
     const updateFields = req.body;
-    // console.log("Update Fields:", updateFields,"userId",userId);
+
+    console.log("Update Fields:", updateFields,"userId",userId);
     const user = await User.findByIdAndUpdate(userId, updateFields, { new: true });
     console.log("Updated User:", user);
     if (!user) {

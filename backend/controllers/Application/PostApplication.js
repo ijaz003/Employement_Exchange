@@ -29,6 +29,7 @@ const postApplication = async (req, res) => {
 
   const resume = req.files.resume;
   const { name, email, coverLetter, phone, address, jobId } = req.body;
+  
 
   if (!name || !email || !coverLetter || !phone || !address || !jobId) {
     return res.status(400).json({

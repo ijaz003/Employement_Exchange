@@ -22,7 +22,7 @@ dbConnection();
 app.use(
   cors({
     origin: [process.env.FRONTEND_URL],
-    methods: ["GET", "POST", "DELETE", "PUT"],
+    methods: ["GET", "POST", "DELETE", "PUT","PATCH"],
     credentials: true,
   })
 );

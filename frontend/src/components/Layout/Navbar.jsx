@@ -7,6 +7,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { FiSun, FiMoon, FiMenu, FiX, FiUser, FiLogOut, FiSettings } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -152,8 +153,12 @@ const Navbar = () => {
                   onClick={toggleProfile}
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
-                    <FiUser className="h-4 w-4 text-white" />
+                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center overflow-hidden">
+                    {user?.avator ? (
+                      <img src={user.avator} alt={user?.name || "User"} className="w-full h-full object-cover rounded-full" />
+                    ) : (
+                      <FiUser className="h-5 w-5 text-white" />
+                    )}
                   </div>
                   <span className="text-gray-700 dark:text-gray-300 font-medium hidden sm:block">
                     {user?.name || "User"}
@@ -228,6 +233,33 @@ const Navbar = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Post Job
+                </Link>
+              )}
+              {isAuthorized && user?.role === "Employer" && (
+                <Link
+                  to="/my-jobs"
+                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Posted Jobs
+                </Link>
+              )}
+              {isAuthorized && user?.role && (
+                <Link
+                  to="/my-applications"
+                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Applications
+                </Link>
+              )}
+              {isAuthorized && user?.role && (
+                <Link
+                  to="/plane"
+                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Buy Planes
                 </Link>
               )}
               {!isAuthorized && (

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Cropper from "react-easy-crop";
+import getCroppedImg from "../../utils/cropImage";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { updateProfile } from "../../store/UserReducers";
@@ -18,6 +20,11 @@ const Profile = () => {
     role: "",
     session_id: ""
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -42,10 +49,16 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let avatarUrl = formData.avator;
+      if (avatarFile) {
+        // Upload avatar to server or cloud (simulate here)
+        // You can replace this with your actual upload logic
+        avatarUrl = URL.createObjectURL(avatarFile);
+      }
       const payload = {
         name: formData.name,
         phone: formData.phone,
-        avator: formData.avator,
+        avator: avatarUrl,
         role: formData.role,
         session_id: formData.session_id
       };
@@ -57,7 +70,9 @@ const Profile = () => {
       dispatch(updateProfile(data.user));
       toast.success("Profile updated successfully!");
       setIsEditing(false);
+      setAvatarFile(null);
     } catch (error) {
+      console.log("Error updating profile:", error);
       toast.error(error.response?.data?.message || "Failed to update profile");
     }
   };
@@ -75,209 +90,181 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <section className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 dark:from-blue-950 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Please login to view profile</h2>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account information and preferences</p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          {/* Profile Header */}
-          <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
-                  <FiUser className="w-10 h-10 text-primary-600" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white">{user.name || "User"}</h2>
-                  <p className="text-primary-100">{user.role === "employer" ? "Employer" : "Job Seeker"}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="flex items-center space-x-2 px-4 py-2 bg-white text-primary-600 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                {isEditing ? <FiX className="w-4 h-4" /> : <FiEdit2 className="w-4 h-4" />}
-                <span>{isEditing ? "Cancel" : "Edit Profile"}</span>
-              </button>
+    <section className="py-16 bg-gradient-to-br from-blue-50 to-gray-50 dark:from-blue-950 dark:via-gray-900 dark:to-gray-800 min-h-screen w-full">
+      <div className="w-full px-0 sm:px-6 lg:px-16">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-10 w-full">
+          {/* Avatar Section */}
+          <div className="flex flex-col items-center justify-center md:w-1/4 w-full pt-8">
+            <div className="relative w-44 h-44 rounded-full overflow-hidden border-4 border-blue-600 shadow-lg mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              {formData.avator ? (
+                <img src={formData.avator} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <FiUser className="w-28 h-28 text-blue-600 bg-white" />
+              )}
+              {isEditing && (
+                <>
+                  <label htmlFor="avatar-upload" className="absolute bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg cursor-pointer flex items-center justify-center transition">
+                    <FiEdit2 className="w-5 h-5" />
+                  </label>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => {
+                      if (e.target.files && e.target.files[0]) {
+                        setAvatarFile(e.target.files[0]);
+                        setCropModalOpen(true);
+                      }
+                    }}
+                  />
+                </>
+              )}
             </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{formData.name || "User"}</h2>
+            <p className="text-blue-600 dark:text-blue-300 font-medium mb-2">{formData.role === "employer" ? "Employer" : "Job Seeker"}</p>
           </div>
-
-          {/* Profile Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Basic Information
-                </h3>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                  />
+          {/* Profile Form Section */}
+          <div className="flex-1 w-full pt-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                    />
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                  />
+                <div className="space-y-6">
+                  {formData.role === "employer" ? (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company Name</label>
+                        <input
+                          type="text"
+                          name="company"
+                          value={formData.company}
+                          onChange={handleInputChange}
+                          disabled={!isEditing}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Website</label>
+                        <input
+                          type="url"
+                          name="website"
+                          value={formData.website}
+                          onChange={handleInputChange}
+                          disabled={!isEditing}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                    </>
+                  ) : null}
                 </div>
               </div>
-
-              {/* Role-specific Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-                  {user.role === "employer" ? "Company Information" : "Professional Information"}
-                </h3>
-
-                {user.role === "employer" ? (
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                {isEditing ? (
                   <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Company Name
-                      </label>
-                      <input
-                        type="text"
-                        name="company"
-                        value={formData.company}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Website
-                      </label>
-                      <input
-                        type="url"
-                        name="website"
-                        value={formData.website}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                      />
-                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCancel}
+                      className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                    >
+                      <FiSave className="w-4 h-4" />
+                      <span>Save Changes</span>
+                    </button>
                   </>
                 ) : (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Skills
-                      </label>
-                      <textarea
-                        name="skills"
-                        value={formData.skills}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        rows="3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                        placeholder="e.g., JavaScript, React, Node.js, Python..."
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Experience
-                      </label>
-                      <textarea
-                        name="experience"
-                        value={formData.experience}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        rows="3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                        placeholder="Describe your work experience..."
-                      />
-                    </div>
-                  </>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(true)}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                  >
+                    <FiEdit2 className="w-4 h-4" />
+                    <span>Edit Profile</span>
+                  </button>
                 )}
               </div>
-            </div>
-
-            {/* Bio */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Bio
-              </label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                rows="4"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                placeholder="Tell us about yourself..."
-              />
-            </div>
-
-            {/* Action Buttons */}
-            {isEditing && (
-              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+            </form>
+          </div>
+        </div>
+        {/* Avatar Crop Modal */}
+        {cropModalOpen && avatarFile && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-xl w-full max-w-lg flex flex-col items-center">
+              <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Crop Avatar</h3>
+              <div className="relative w-64 h-64 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <Cropper
+                  image={URL.createObjectURL(avatarFile)}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={(_, croppedAreaPixels) => setCroppedAreaPixels(croppedAreaPixels)}
+                />
+              </div>
+              <div className="flex gap-4 mt-6">
                 <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  onClick={async () => {
+                    const croppedImg = await getCroppedImg(URL.createObjectURL(avatarFile), croppedAreaPixels);
+                    setFormData(prev => ({ ...prev, avator: croppedImg }));
+                    setCropModalOpen(false);
+                  }}
+                >
+                  Save
+                </button>
+                <button
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                  onClick={() => {
+                    setAvatarFile(null);
+                    setCropModalOpen(false);
+                  }}
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2"
-                >
-                  <FiSave className="w-4 h-4" />
-                  <span>Save Changes</span>
-                </button>
               </div>
-            )}
-          </form>
-        </div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -20,7 +20,8 @@ const Application = () => {
     setResume(resume);
   };
 
-  const { id } = useParams();
+  const { jobId } = useParams();
+  console.log(jobId, "Job ID from URL params");
 
   const handleApplication = async (e) => {
     e.preventDefault();
@@ -37,7 +38,7 @@ const Application = () => {
     formData.append("address", address);
     formData.append("coverLetter", coverLetter);
     formData.append("resume", resume);
-    formData.append("jobId", id);
+    formData.append("jobId", jobId);
 
     try {
       const { data } = await axios.post(
@@ -57,7 +58,7 @@ const Application = () => {
       setAddress("");
       setResume(null);
       toast.success(data.message);
-      navigate("/applications/me");
+      navigate("/my-applications");
     } catch (error) {
       toast.error(error.response?.data?.message || "Application failed");
     }

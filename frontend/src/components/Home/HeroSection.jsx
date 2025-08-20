@@ -1,9 +1,19 @@
 import { Link } from "react-router-dom";
+import React from "react";
 import { FiSearch, FiBriefcase, FiUsers, FiTrendingUp } from "react-icons/fi";
 
 const HeroSection = () => {
+  // Search bar state and handler
+  const [search, setSearch] = React.useState("");
+  const handleSearch = () => {
+    // TODO: Integrate with jobs API
+    if (search.trim()) {
+      window.location.href = `/jobs?search=${encodeURIComponent(search)}`;
+    }
+  };
+
   return (
-    <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.4%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
@@ -12,73 +22,76 @@ const HeroSection = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
         <div className="text-center">
           {/* Main Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in">
             Find Your Dream Job or
-            <span className="block text-primary-200">Hire the Perfect Candidate</span>
+            <span className="block text-blue-200 animate-gradient">Hire the Perfect Candidate</span>
           </h1>
-          
           {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-primary-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-2xl md:text-3xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in delay-100">
             Connect with top employers and talented professionals. Whether you&apos;re looking for your next career move or building your dream team, we&apos;ve got you covered.
           </p>
 
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12">
+          <div className="max-w-2xl mx-auto mb-14 animate-fade-in delay-200">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <FiSearch className="h-6 w-6 text-gray-400" />
               </div>
               <input
                 type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 placeholder="Search for jobs, companies, or skills..."
-                className="w-full pl-12 pr-4 py-4 text-lg bg-white rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50 text-gray-900 placeholder-gray-500"
+                className="w-full pl-12 pr-4 py-4 text-lg bg-white rounded-lg shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 text-gray-900 placeholder-gray-500 transition-all duration-200"
               />
-              <button className="absolute inset-y-0 right-0 px-6 bg-primary-600 text-white font-semibold rounded-r-lg hover:bg-primary-700 transition-colors">
+              <button
+                className="absolute inset-y-0 right-0 px-6 bg-blue-600 text-white font-semibold rounded-r-lg hover:bg-blue-700 transition-colors"
+                onClick={handleSearch}
+              >
                 Search
               </button>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 animate-fade-in delay-300">
             <Link
               to="/jobs"
-              className="px-8 py-4 bg-white text-primary-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+              className="px-10 py-5 bg-white text-blue-700 font-bold rounded-xl hover:bg-gray-50 transition-colors shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200 text-lg"
             >
               Browse Jobs
             </Link>
             <Link
               to="/post-job"
-              className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+              className="px-10 py-5 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-blue-700 transition-colors shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200 text-lg"
             >
               Post a Job
             </Link>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-4xl mx-auto animate-fade-in delay-400">
             <div className="text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiBriefcase className="h-8 w-8 text-white" />
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg animate-bounce-slow">
+                <FiBriefcase className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-white mb-2">10,000+</h3>
-              <p className="text-primary-100">Active Jobs</p>
+              <h3 className="text-4xl font-extrabold text-white mb-2">10,000+</h3>
+              <p className="text-blue-100">Active Jobs</p>
             </div>
-            
             <div className="text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiUsers className="h-8 w-8 text-white" />
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg animate-bounce-slow delay-100">
+                <FiUsers className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-white mb-2">50,000+</h3>
-              <p className="text-primary-100">Job Seekers</p>
+              <h3 className="text-4xl font-extrabold text-white mb-2">50,000+</h3>
+              <p className="text-blue-100">Job Seekers</p>
             </div>
-            
             <div className="text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiTrendingUp className="h-8 w-8 text-white" />
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg animate-bounce-slow delay-200">
+                <FiTrendingUp className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-white mb-2">95%</h3>
-              <p className="text-primary-100">Success Rate</p>
+              <h3 className="text-4xl font-extrabold text-white mb-2">95%</h3>
+              <p className="text-blue-100">Success Rate</p>
             </div>
           </div>
         </div>
