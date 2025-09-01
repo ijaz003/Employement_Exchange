@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import store from "./store/store";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -20,54 +20,136 @@ import ResumeUpload from "./components/Profile/ResumeUpload";
 import BuyPlan from "./components/BuyPlan";
 import Success from "./components/Success";
 import ProtectedRoute from "./components/Middleware/ProtectedRoute";
+import socket from "./utils/socket";
+import { useEffect } from "react";
+import Notifications from "./components/Notifications";
 
 // home,Jobs,
 function App() {
+  const { isAuthorized, user } = useSelector((state) => state.user);
+  useEffect(() => {
+     if (isAuthorized) {
+      socket.connect();
+      socket.on("connect", () => {
+        console.log("Socket connected");
+        // Optionally register user for targeted events
+        if (user && user._id) {
+          socket.emit("registerUser", user);
+        }
+      });
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    })
+  }else{
+    socket.disconnect();
+  }
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.disconnect();
+    };
+  }, [isAuthorized, user]);
   return (
-      <ThemeProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-            <Navbar />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} /> 
-                <Route path="/jobs" element={<Jobs />} />
-                <Route path="/job/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
-                <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />  
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/application/:jobId" element={<ProtectedRoute><Application /></ProtectedRoute>} />
-                <Route path="/my-applications" element={<ProtectedRoute><MyApplications /></ProtectedRoute>} />
-                <Route path="/my-jobs" element={<ProtectedRoute><MyJobs /></ProtectedRoute>} />
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="/resume-upload" element={<ProtectedRoute><ResumeUpload /></ProtectedRoute>} />
-                <Route path="/plane" element={<BuyPlan />} />
-                <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: '#363636',
-                  color: '#fff',
+    <ThemeProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route
+                path="/job/:id"
+                element={
+                  <ProtectedRoute>
+                    <JobDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/post-job"
+                element={
+                  <ProtectedRoute>
+                    <PostJob />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/application/:jobId"
+                element={
+                  <ProtectedRoute>
+                    <Application />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-applications"
+                element={
+                  <ProtectedRoute>
+                    <MyApplications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-jobs"
+                element={
+                  <ProtectedRoute>
+                    <MyJobs />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume-upload"
+                element={
+                  <ProtectedRoute>
+                    <ResumeUpload />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/plane" element={<BuyPlan />} />
+              <Route
+                path="/success"
+                element={
+                  <ProtectedRoute>
+                    <Success />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#363636",
+                color: "#fff",
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: "#10b981",
+                  secondary: "#fff",
                 },
-                success: {
-                  duration: 3000,
-                  iconTheme: {
-                    primary: '#10b981',
-                    secondary: '#fff',
-                  },
-                },
-              }}
-            />
-          </div>
-        </Router>
-      </ThemeProvider>
-    
+              },
+            }}
+          />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

@@ -49,23 +49,25 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      let avatarUrl = formData.avator;
+      const form = new FormData();
+      form.append("name", formData.name);
+      form.append("phone", formData.phone);
+      form.append("role", formData.role);
+      form.append("session_id", formData.session_id);
       if (avatarFile) {
-        // Upload avatar to server or cloud (simulate here)
-        // You can replace this with your actual upload logic
-        avatarUrl = URL.createObjectURL(avatarFile);
+        form.append("file", avatarFile);
       }
-      const payload = {
-        name: formData.name,
-        phone: formData.phone,
-        avator: avatarUrl,
-        role: formData.role,
-        session_id: formData.session_id
-      };
+      // If not uploading a new avatar, send current avatar url as a field
+      if (!avatarFile && formData.avator) {
+        form.append("avatar", formData.avator);
+      }
       const { data } = await axios.patch(
         "http://localhost:4000/auth/update",
-        payload,
-        { withCredentials: true }
+        form,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
       dispatch(updateProfile(data.user));
       toast.success("Profile updated successfully!");
@@ -98,13 +100,14 @@ const Profile = () => {
     );
   }
 
+  // ...existing code...
   return (
-    <section className="py-16 bg-gradient-to-br from-blue-50 to-gray-50 dark:from-blue-950 dark:via-gray-900 dark:to-gray-800 min-h-screen w-full">
-      <div className="w-full px-0 sm:px-6 lg:px-16">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-10 w-full">
+    <section className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:via-gray-900 dark:to-blue-800 py-16 px-2 animate-fade-in">
+      <div className="max-w-5xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-12 w-full">
           {/* Avatar Section */}
-          <div className="flex flex-col items-center justify-center md:w-1/4 w-full pt-8">
-            <div className="relative w-44 h-44 rounded-full overflow-hidden border-4 border-blue-600 shadow-lg mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center md:w-1/3 w-full pt-8 animate-fade-in-up">
+            <div className="relative w-44 h-44 rounded-full overflow-hidden border-4 border-blue-600 shadow-xl mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center group">
               {formData.avator ? (
                 <img src={formData.avator} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
@@ -112,7 +115,7 @@ const Profile = () => {
               )}
               {isEditing && (
                 <>
-                  <label htmlFor="avatar-upload" className="absolute bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg cursor-pointer flex items-center justify-center transition">
+                  <label htmlFor="avatar-upload" className="absolute bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg cursor-pointer flex items-center justify-center transition group-hover:scale-110">
                     <FiEdit2 className="w-5 h-5" />
                   </label>
                   <input
@@ -130,68 +133,80 @@ const Profile = () => {
                 </>
               )}
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{formData.name || "User"}</h2>
-            <p className="text-blue-600 dark:text-blue-300 font-medium mb-2">{formData.role === "employer" ? "Employer" : "Job Seeker"}</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-1 tracking-tight">{formData.name || "User"}</h2>
+            <p className="text-blue-600 dark:text-blue-300 font-medium mb-2 text-lg">{formData.role === "employer" ? "Employer" : "Job Seeker"}</p>
           </div>
           {/* Profile Form Section */}
-          <div className="flex-1 w-full pt-8">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+          <div className="flex-1 w-full pt-8 animate-fade-in-up">
+            <form onSubmit={handleSubmit} className="space-y-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="space-y-8">
+                  <div className="relative">
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                      className="peer w-full px-4 pt-6 pb-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all"
+                      placeholder=" "
                     />
+                    <label className="absolute left-4 top-2 text-gray-500 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm bg-transparent px-1 pointer-events-none">
+                      Full Name
+                    </label>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
+                  <div className="relative">
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                      className="peer w-full px-4 pt-6 pb-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all"
+                      placeholder=" "
                     />
+                    <label className="absolute left-4 top-2 text-gray-500 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm bg-transparent px-1 pointer-events-none">
+                      Phone
+                    </label>
                   </div>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {formData.role === "employer" ? (
                     <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company Name</label>
+                      <div className="relative">
                         <input
                           type="text"
                           name="company"
                           value={formData.company}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                          className="peer w-full px-4 pt-6 pb-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all"
+                          placeholder=" "
                         />
+                        <label className="absolute left-4 top-2 text-gray-500 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm bg-transparent px-1 pointer-events-none">
+                          Company Name
+                        </label>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Website</label>
+                      <div className="relative">
                         <input
                           type="url"
                           name="website"
                           value={formData.website}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                          className="peer w-full px-4 pt-6 pb-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all"
+                          placeholder=" "
                         />
+                        <label className="absolute left-4 top-2 text-gray-500 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm bg-transparent px-1 pointer-events-none">
+                          Website
+                        </label>
                       </div>
                     </>
                   ) : null}
                 </div>
               </div>
               {/* Action Buttons */}
-              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex justify-end space-x-4 pt-8 border-t border-gray-200 dark:border-gray-700">
                 {isEditing ? (
                   <>
                     <button
@@ -203,7 +218,7 @@ const Profile = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-md animate-bounce-in"
                     >
                       <FiSave className="w-4 h-4" />
                       <span>Save Changes</span>
@@ -213,7 +228,7 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={() => setIsEditing(true)}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-md animate-bounce-in"
                   >
                     <FiEdit2 className="w-4 h-4" />
                     <span>Edit Profile</span>
@@ -225,7 +240,7 @@ const Profile = () => {
         </div>
         {/* Avatar Crop Modal */}
         {cropModalOpen && avatarFile && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 animate-fade-in">
             <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-xl w-full max-w-lg flex flex-col items-center">
               <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Crop Avatar</h3>
               <div className="relative w-64 h-64 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
@@ -264,6 +279,30 @@ const Profile = () => {
           </div>
         )}
       </div>
+      <style>{`
+        .animate-fade-in-up {
+          animation: fadeInUp 0.7s cubic-bezier(.39,.575,.565,1) both;
+        }
+        @keyframes fadeInUp {
+          0% { opacity: 0; transform: translateY(40px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.7s cubic-bezier(.39,.575,.565,1) both;
+        }
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        .animate-bounce-in {
+          animation: bounceIn 0.7s cubic-bezier(.39,.575,.565,1) both;
+        }
+        @keyframes bounceIn {
+          0% { opacity: 0; transform: scale(0.8); }
+          60% { opacity: 1; transform: scale(1.05); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
     </section>
   );
 };

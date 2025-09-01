@@ -1,7 +1,9 @@
 import { Application } from "../../models/applicationSchema.js";
 import { Job } from "../../models/jobSchema.js";
+import { Notification } from "../../models/notificationSchema.js";
 // import cloudinary from "cloudinary";
 import cloudinary from "../../utils/cloudinary.js";
+import {io,userSocketMap} from "../../app.js";
 
 const postApplication = async (req, res) => {
 
@@ -73,6 +75,22 @@ const postApplication = async (req, res) => {
       url: uploadResult.secure_url,
     },
   });
+  
+  // Emit only to the employer's socket
+  const employerId = job.postedBy;
+  const employerSocketId = userSocketMap[employerId];
+  if (employerSocketId) {
+    io.to(employerSocketId).emit("jobApplied", application);
+    // Create a notification for the employer
+    const notification = await Notification.create({
+      sender: userId,
+      receiver: employerId,
+      type: "apply",
+      content: `A new application has been submitted for your job: ${job.title}`,
+    });
+    io.to(employerSocketId).emit("notification", notification);
+    console.log(notification, "Notification data");
+  }
 
   res.status(201).json({
     success: true,

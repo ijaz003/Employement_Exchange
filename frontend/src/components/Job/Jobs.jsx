@@ -13,6 +13,7 @@ import {
   FaGlobe
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
+import socket from "../../utils/socket";
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -23,15 +24,31 @@ const Jobs = () => {
   const [salaryMin, setSalaryMin] = useState("");
   const [salaryMax, setSalaryMax] = useState("");
   const [expired, setExpired] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(9);
+
+  useEffect(() => {
+    socket.on("newJobPosted", (job) => {
+      setJobs((prevJobs) => [job, ...prevJobs]);
+    });
+
+    return () => {
+      socket.off("newJobPosted");
+    };
+  }, []);
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:4000/job/getall", {
+        const response = await axios.get(`http://localhost:4000/job/getall?page=${page}&limit=${limit}`, {
           withCredentials: true,
         });
-        setJobs(response.data);
+        if(response.data.success) {
+          setJobs(response.data.jobs);
+          setTotalPages(response.data.totalPages || 1);
+        }
       } catch (error) {
         toast.error(error.response?.data?.message || "Failed to fetch jobs");
       } finally {
@@ -39,11 +56,21 @@ const Jobs = () => {
       }
     };
     fetchJobs();
-  }, []);
+  }, [page, limit]);
 
+  // Pagination controls
+  const handlePrevPage = () => {
+    setPage((prev) => Math.max(prev - 1, 1));
+  };
+  const handleNextPage = () => {
+    setPage((prev) => Math.min(prev + 1, totalPages));
+  };
+  const handlePageClick = (pageNum) => {
+    setPage(pageNum);
+  };
   // Filtering logic
-  const filteredJobs = jobs.jobs
-    ? jobs.jobs.filter((job) => {
+  const filteredJobs = jobs
+    ? jobs.filter((job) => {
         const matchesSearch =
           job.title.toLowerCase().includes(search.toLowerCase()) ||
           job.description?.toLowerCase().includes(search.toLowerCase());
@@ -184,7 +211,7 @@ const Jobs = () => {
           </div>
         </div>
 
-        {/* Job Cards */}
+  {/* Job Cards */}
         {filteredJobs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredJobs.map((job) => (
@@ -294,6 +321,32 @@ const Jobs = () => {
             </div>
           </div>
         )}
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-8 gap-2">
+        <button
+          onClick={handlePrevPage}
+          disabled={page === 1}
+          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        {[...Array(totalPages)].map((_, idx) => (
+          <button
+            key={idx + 1}
+            onClick={() => handlePageClick(idx + 1)}
+            className={`px-3 py-2 rounded ${page === idx + 1 ? 'bg-blue-700 text-white font-bold' : 'bg-blue-100 text-blue-800'}`}
+          >
+            {idx + 1}
+          </button>
+        ))}
+        <button
+          onClick={handleNextPage}
+          disabled={page === totalPages}
+          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </section>
   );

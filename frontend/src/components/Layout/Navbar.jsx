@@ -8,6 +8,7 @@ import { FiSun, FiMoon, FiMenu, FiX, FiUser, FiLogOut, FiSettings } from "react-
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import axios from "axios";
+import socket from "../../utils/socket";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,6 +26,7 @@ const Navbar = () => {
           withCredentials: true,
         }
       );
+      socket.disconnect();
       toast.success(response.data.message);
       dispatch(setIsAuthorized(false));
       dispatch(setUser({}));
@@ -59,6 +61,12 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
+              <Link
+                to="/notifications"
+                className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Notifications
+              </Link>
               <Link
                 to="/"
                 className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"

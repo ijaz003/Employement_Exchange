@@ -1,9 +1,14 @@
 import { User } from "../../models/userSchema.js";
 import { sendToken } from "../../utils/jwtToken.js";
 import bcrypt from "bcrypt";
+import {io} from "../../app.js";
 
 
  const login = async (req, res) => {
+  io.emit("jobApplied", {
+  name:"ijaz",
+  jobId:"89798udsfkj",
+});
   try {
     const { email, password, role } = req.body;
     console.log(req.body,"data by signin")

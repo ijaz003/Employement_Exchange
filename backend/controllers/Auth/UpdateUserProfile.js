@@ -1,9 +1,18 @@
 import { User } from "../../models/userSchema.js";
+import cloudinary from "../../utils/cloudinary.js";
 
 export const updateUserProfile = async (req, res) => {
   try {
     const userId = req.user._id;
     const updateFields = req.body;
+
+    console.log(updateFields,"update data fields");
+
+    // Handle avatar upload
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      updateFields.avatar = result.secure_url;
+    }
 
     console.log("Update Fields:", updateFields,"userId",userId);
     const user = await User.findByIdAndUpdate(userId, updateFields, { new: true });

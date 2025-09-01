@@ -67,18 +67,14 @@ const Login = () => {
   }, [isAuthorized, navigate]);
 
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     if (!formData.role) {
       toast.error("Please select a role first");
       return;
     }
-    
     setIsGoogleLoading(true);
-    try {
-    } catch (error) {
-      toast.error("Google login failed");
-      setIsGoogleLoading(false);
-    }
+    // Open Google OAuth with role as query param
+    window.open(`http://localhost:4000/auth/google?role=${encodeURIComponent(formData.role)}`, "_self");
   };
 
   return (

@@ -1,4 +1,6 @@
 import { Job } from "../../models/jobSchema.js";
+import { io } from "../../app.js";
+import { Notification } from "../../models/notificationSchema.js";
 
 const postJob = async (req, res) => {
   try {
@@ -65,6 +67,15 @@ const postJob = async (req, res) => {
       postedBy,
     });
 
+    io.emit("newJobPosted", job);
+    const notification = await Notification.create({
+          sender: postedBy,
+          receiver: null,
+          type: "post",
+          content: `A new post has been created: ${job.title}`,
+        });
+        io.emit("notification", notification);
+        console.log(notification, "Notification data");
     res.status(201).json({
       success: true,
       message: "Job posted successfully!",

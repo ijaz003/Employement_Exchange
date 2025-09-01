@@ -19,7 +19,7 @@ const jobseekerDeleteApplication = async (req, res) => {
     }
 
     await Application.findByIdAndDelete(id);
-
+    
     res.status(200).json({
       success: true,
       message: "Application deleted successfully.",
