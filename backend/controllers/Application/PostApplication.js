@@ -89,6 +89,7 @@ const postApplication = async (req, res) => {
       content: `A new application has been submitted for your job: ${job.title}`,
     });
     io.to(employerSocketId).emit("notification", notification);
+    io.to(employerSocketId).emit("newNotification",  notification );
     console.log(notification, "Notification data");
   }
 

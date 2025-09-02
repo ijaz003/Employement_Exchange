@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import socket from "../utils/socket";
 import { useSelector } from "react-redux";
+import { addNotification, removeNotification, storeNotifications } from "../store/NotificationReducer";
+import { useDispatch } from "react-redux";
+
 
 function formatRelativeTime(dateString) {
+
   const now = new Date();
   const date = new Date(dateString);
   const diff = Math.floor((now - date) / 1000);
@@ -20,10 +24,12 @@ function formatRelativeTime(dateString) {
 }
 
 const Notifications = () => {
+  const dispatch=useDispatch();
   const { user } = useSelector((state) => state.user);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
 
   useEffect(() => {
     socket.on("notification", (notification) => {
@@ -34,12 +40,18 @@ const Notifications = () => {
     };
   }, []);
 
+
+  // Get unreadCount from Redux
+  const unreadCount = useSelector((state) => state.notifications.unreadCount);
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         setLoading(true);
         const res = await axios.get("http://localhost:4000/notifications", { withCredentials: true });
         setNotifications(res.data.notifications || []);
+        // Store unreadCount in Redux
+        // dispatch(storeNotifications(res.data.unreadCount || 0));
       } catch (err) {
         setError("Failed to fetch notifications");
       } finally {
@@ -47,7 +59,7 @@ const Notifications = () => {
       }
     };
     fetchNotifications();
-  }, []);
+  }, [dispatch]);
 
   const isNotificationRead = (notification) => {
     if (notification.receiver) {
@@ -62,6 +74,7 @@ const Notifications = () => {
     if (!isNotificationRead(notification)) {
       try {
         await axios.patch(`http://localhost:4000/notifications/unread/${notification._id}`, {}, { withCredentials: true });
+  dispatch(removeNotification()); // decrement unreadCount in Redux
         setNotifications((prev) =>
           prev.map((n) => {
             if (n._id === notification._id) {
@@ -83,7 +96,12 @@ const Notifications = () => {
 
   return (
     <section className="max-w-md mx-auto mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-blue-800 dark:text-blue-300 mb-4">Notifications</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-blue-800 dark:text-blue-300">Notifications</h2>
+        <span className="inline-block bg-red-600 text-white text-xs rounded-full px-2 py-0.5">
+          Unread: {unreadCount}
+        </span>
+      </div>
       {loading ? (
         <div className="text-center py-6 text-gray-500 dark:text-gray-400">Loading...</div>
       ) : error ? (

@@ -1,14 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-// import { logout,setIsAuthorized } from "../../store/UserReducers";
 import { setIsAuthorized, setUser } from "../../store/UserReducers";
 import { useTheme } from "../../contexts/ThemeContext";
-import { FiSun, FiMoon, FiMenu, FiX, FiUser, FiLogOut, FiSettings } from "react-icons/fi";
+import {
+  FiSun,
+  FiMoon,
+  FiMenu,
+  FiX,
+  FiUser,
+  FiLogOut,
+  FiSettings,
+  FiBell,
+} from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import axios from "axios";
 import socket from "../../utils/socket";
+import { addNotification, storeNotifications } from "../../store/NotificationReducer";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,15 +26,33 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isAuthorized } = useSelector((state) => state.user);
+  const unreadCount = useSelector((state) => state.notifications.unreadCount);
+
+  useEffect(() => {
+    // Fetch initial unread count on mount
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/notifications", { withCredentials: true });
+        dispatch(storeNotifications(res.data.unreadCount || 0));
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    fetchUnreadCount();
+
+    socket.on("newNotification", (notification) => {
+      dispatch(addNotification());
+    });
+    return () => {
+      socket.off("newNotification");
+    };
+  }, [dispatch]);
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/auth/logout",
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get("http://localhost:4000/auth/logout", {
+        withCredentials: true,
+      });
       socket.disconnect();
       toast.success(response.data.message);
       dispatch(setIsAuthorized(false));
@@ -38,7 +65,6 @@ const Navbar = () => {
   };
 
   const handleGoogleLogin = () => {
-    // Google OAuth implementation will be added here
     window.open("http://localhost:4000/auth/google", "_self");
   };
 
@@ -52,21 +78,25 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
-              <img src="/careerconnect-black.png" alt="CareerConnect" className="h-10 w-auto dark:hidden" />
-              <img src="/careerconnect-white.png" alt="CareerConnect" className="h-10 w-auto hidden dark:block" />
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">CareerConnect</span>
+              <img
+                src="/careerconnect-black.png"
+                alt="CareerConnect"
+                className="h-10 w-auto dark:hidden"
+              />
+              <img
+                src="/careerconnect-white.png"
+                alt="CareerConnect"
+                className="h-10 w-auto hidden dark:block"
+              />
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                CareerConnect
+              </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <Link
-                to="/notifications"
-                className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Notifications
-              </Link>
               <Link
                 to="/"
                 className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
@@ -87,9 +117,6 @@ const Navbar = () => {
                   Post Job
                 </Link>
               )}
-
-              
-
               {isAuthorized && user?.role === "Employer" && (
                 <Link
                   to="/my-jobs"
@@ -98,8 +125,6 @@ const Navbar = () => {
                   Posted Jobs
                 </Link>
               )}
-
-
               {isAuthorized && user?.role && (
                 <Link
                   to="/my-applications"
@@ -108,7 +133,6 @@ const Navbar = () => {
                   Applications
                 </Link>
               )}
-
               {isAuthorized && user?.role && (
                 <Link
                   to="/plane"
@@ -120,8 +144,23 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Right side - Theme toggle, Auth buttons */}
+          {/* Right side - Theme toggle, Notification, Auth buttons */}
           <div className="flex items-center space-x-4">
+            {/* Notification Bell */}
+            {isAuthorized && (
+              <Link
+                to="/notifications"
+                className="relative p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                <FiBell className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -163,7 +202,11 @@ const Navbar = () => {
                 >
                   <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center overflow-hidden">
                     {user?.avator ? (
-                      <img src={user.avator} alt={user?.name || "User"} className="w-full h-full object-cover rounded-full" />
+                      <img
+                        src={user.avator}
+                        alt={user?.name || "User"}
+                        className="w-full h-full object-cover rounded-full"
+                      />
                     ) : (
                       <FiUser className="h-5 w-5 text-white" />
                     )}
@@ -211,7 +254,11 @@ const Navbar = () => {
               onClick={toggleMenu}
               className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              {isMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
+              {isMenuOpen ? (
+                <FiX className="h-6 w-6" />
+              ) : (
+                <FiMenu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>

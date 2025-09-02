@@ -75,6 +75,7 @@ const postJob = async (req, res) => {
           content: `A new post has been created: ${job.title}`,
         });
         io.emit("notification", notification);
+        io.emit("newNotification", { notification });
         console.log(notification, "Notification data");
     res.status(201).json({
       success: true,

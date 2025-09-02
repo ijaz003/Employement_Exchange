@@ -22,33 +22,36 @@ import Success from "./components/Success";
 import ProtectedRoute from "./components/Middleware/ProtectedRoute";
 import socket from "./utils/socket";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { addNotification } from "./store/NotificationReducer";
 import Notifications from "./components/Notifications";
 
 // home,Jobs,
 function App() {
   const { isAuthorized, user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   useEffect(() => {
-     if (isAuthorized) {
+    if (isAuthorized) {
       socket.connect();
       socket.on("connect", () => {
         console.log("Socket connected");
-        // Optionally register user for targeted events
         if (user && user._id) {
           socket.emit("registerUser", user);
         }
       });
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected");
-    })
-  }else{
-    socket.disconnect();
-  }
+      
+      socket.on("disconnect", () => {
+        console.log("Socket disconnected");
+      });
+    } else {
+      socket.disconnect();
+    }
     return () => {
       socket.off("connect");
       socket.off("disconnect");
       socket.disconnect();
     };
-  }, [isAuthorized, user]);
+  }, [isAuthorized, user, dispatch]);
   return (
     <ThemeProvider>
       <Router>

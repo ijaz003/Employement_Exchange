@@ -10,8 +10,21 @@ const GetNotifications = async (req, res) => {
       ]
   }).sort({ createdAt: -1 });
 
+  // Count unread notifications for this user
+  const userId = req.user._id.toString();
+  const unreadCount = notifications.filter(notification => {
+    // Personal notification
+    if (notification.receiver) {
+      return !notification.isRead;
+    } else {
+      // Global notification
+      return !(notification.readBy || []).map(String).includes(userId);
+    }
+  }).length;
+
     res.status(200).json({
       success: true,
+      unreadCount,
       notifications,
     });
   } catch (error) {
