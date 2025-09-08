@@ -1,3 +1,4 @@
+import useAxios from "../hooks/useAxios";
 import React from "react";
 import { useEffect } from "react";
 import { FiCheckCircle } from "react-icons/fi";
@@ -34,63 +35,49 @@ let monthlyPlanId = "price_1RxNBILPbohNYBTRw11asdyE";
 
 let yearlyPlanId =  "price_1RxOWfLPbohNYBTR7efF8ARL"; // Replace with your actual yearly Stripe price ID
 
-const handleMonthlyPlan = async() => {
- try {
-      const response = await fetch('http://localhost:4000/payment/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ priceId: monthlyPlanId }),
-        credentials: 'include'
-      })
-      const data = await response.json()
-      console.log(data.url)
+const BuyPlan = () => {
+  const axios = useAxios();
+
+  const handleMonthlyPlan = async () => {
+    try {
+      const { data } = await axios.post(
+        "/payment/create-checkout-session",
+        { priceId: monthlyPlanId }
+      );
       if (data.url) {
-        window.location.href = data.url // Redirect to Stripe checkout
+        window.location.href = data.url;
       } else {
-        alert('Error: No checkout URL returned')
+        alert("Error: No checkout URL returned");
       }
     } catch (error) {
-      alert('Error creating checkout session')
+      alert("Error creating checkout session");
     }
-};
+  };
 
-const handleYearlyPlan = async () => {
-  try {
-    const response = await fetch('http://localhost:4000/payment/create-checkout-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ priceId: yearlyPlanId }),
-      credentials: 'include'
-    })
-    const data = await response.json()
-    console.log(data)
-    if (data.url) {
-      window.location.href = data.url // Redirect to Stripe checkout
-    } else {
-      alert('Error: No checkout URL returned')
-    }
-  } catch (error) {
-    alert('Error creating checkout session')
-  }
-};
-
-const BuyPlan = () => {
-
-
-
-   const { isAuthorized, user } = useSelector((state) => state.user);
-    const navigate = useNavigate();
-  
-    useEffect(() => {
-      if (!isAuthorized) {
-        navigate("/login");
+  const handleYearlyPlan = async () => {
+    try {
+      const { data } = await axios.post(
+        "/payment/create-checkout-session",
+        { priceId: yearlyPlanId }
+      );
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Error: No checkout URL returned");
       }
-      // eslint-disable-next-line
-    }, [isAuthorized, user, navigate]);
+    } catch (error) {
+      alert("Error creating checkout session");
+    }
+  };
+
+  const { isAuthorized, user } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isAuthorized) {
+      navigate("/login");
+    }
+    // eslint-disable-next-line
+  }, [isAuthorized, user, navigate]);
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-blue-950 dark:via-gray-900 dark:to-gray-800 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">

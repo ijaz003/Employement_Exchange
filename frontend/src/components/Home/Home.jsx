@@ -47,7 +47,7 @@ useEffect(() => {
         // Optionally handle error
       }
     }
-  }, [dispatch, navigate]);
+  }, []);
   console.log(user,"After payment")
   return (
     <main>

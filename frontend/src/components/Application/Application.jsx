@@ -1,4 +1,4 @@
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,6 +11,7 @@ const Application = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [resume, setResume] = useState(null);
+  const axios = useAxios();
 
   const { isAuthorized, user } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -42,10 +43,9 @@ const Application = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:4000/application/post",
+        "/application/post",
         formData,
         {
-          withCredentials: true,
           headers: {
             "Content-Type": "multipart/form-data",
           },

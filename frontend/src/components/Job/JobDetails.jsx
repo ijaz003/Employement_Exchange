@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { FaMapMarkerAlt, FaBriefcase, FaCalendarAlt, FaMoneyBillWave, FaUserTie } from "react-icons/fa";
 
 const JobDetails = () => {
+  const axios = useAxios();
   const { id } = useParams();
   const [job, setJob] = useState({});
   const navigateTo = useNavigate();
@@ -13,9 +14,7 @@ const JobDetails = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/job/${id}`, {
-        withCredentials: true,
-      })
+      .get(`/job/${id}`)
       .then((res) => {
         setJob(res.data.job);
       })

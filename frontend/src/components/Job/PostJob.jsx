@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const PostJob = () => {
+  const axios = useAxios();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -40,7 +41,7 @@ const PostJob = () => {
     }
     try {
       const res = await axios.post(
-        "http://localhost:4000/job/postjob",
+        "/job/postjob",
         fixedSalary.length >= 2
           ? {
               title,
@@ -62,7 +63,6 @@ const PostJob = () => {
               salaryTo,
             },
         {
-          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },

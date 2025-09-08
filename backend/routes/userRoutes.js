@@ -49,7 +49,8 @@ router.get('/google/callback',
       name: user.name,
       email: user.email,
       avator: user.avator,
-      role: user.role
+      role: user.role,
+      session_id: user.session_id
     }));
     res.redirect(`${process.env.FRONTEND_URL}/?googleUser=${userQuery}`);
   }

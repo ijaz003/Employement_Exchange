@@ -39,7 +39,7 @@ function App() {
           socket.emit("registerUser", user);
         }
       });
-      
+
       socket.on("disconnect", () => {
         console.log("Socket disconnected");
       });
@@ -61,7 +61,14 @@ function App() {
             <Routes>
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/" element={<Home />} />
-              <Route path="/jobs" element={<Jobs />} />
+              <Route
+                path="/jobs"
+                element={
+                  <ProtectedRoute>
+                    <Jobs />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/job/:id"
                 element={
@@ -104,22 +111,8 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/resume-upload"
-                element={
-                  <ProtectedRoute>
-                    <ResumeUpload />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/resume-upload" element={<ResumeUpload />} />
               <Route path="/plane" element={<BuyPlan />} />
               <Route
                 path="/success"

@@ -1,4 +1,4 @@
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaCheck, FaEdit, FaTrash, FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const MyJobs = () => {
+  const axios = useAxios();
   const [myJobs, setMyJobs] = useState([]);
   const [expandedJobId, setExpandedJobId] = useState(null);
   const [editingMode, setEditingMode] = useState(null);
@@ -21,8 +22,7 @@ const MyJobs = () => {
     const fetchJobs = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:4000/job/getmyjobs",
-          { withCredentials: true }
+          "/job/getmyjobs"
         );
         setMyJobs(data.jobs || data.myJobs || []);
       } catch (error) {
@@ -51,9 +51,8 @@ const MyJobs = () => {
     const updatedJob = myJobs.find((job) => job._id === jobId);
     try {
       await axios.put(
-        `http://localhost:4000/job/update/${jobId}`,
-        updatedJob,
-        { withCredentials: true }
+        `/job/update/${jobId}`,
+        updatedJob
       );
       toast.success("Job updated successfully");
       setEditingMode(null);
@@ -65,8 +64,7 @@ const MyJobs = () => {
   const handleDeleteJob = async (jobId) => {
     try {
       await axios.delete(
-        `http://localhost:4000/job/delete/${jobId}`,
-        { withCredentials: true }
+        `/job/delete/${jobId}`
       );
       toast.success("Job deleted successfully");
       setMyJobs((prevJobs) => prevJobs.filter((job) => job._id !== jobId));

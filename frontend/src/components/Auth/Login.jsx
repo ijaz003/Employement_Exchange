@@ -6,7 +6,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiHome, FiBriefcase } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +14,7 @@ const Login = () => {
     password: "",
     role: "",
   });
+  const axios = useAxios();
   const [showPassword, setShowPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isLoading,setIsLoading]=useState(false);
@@ -37,13 +38,12 @@ const Login = () => {
     setIsLoading(true);
     try {
       const { data } = await axios.post(
-        "http://localhost:4000/auth/login",
+        "/auth/login",
         formData,
         {
           headers: {
             "Content-Type": "application/json", 
           },
-          withCredentials: true,
         }
       );
       toast.success(data.message);
@@ -74,7 +74,7 @@ const Login = () => {
     }
     setIsGoogleLoading(true);
     // Open Google OAuth with role as query param
-    window.open(`http://localhost:4000/auth/google?role=${encodeURIComponent(formData.role)}`, "_self");
+  window.open(`${import.meta.env.VITE_BACKEND_URL}/auth/google?role=${encodeURIComponent(formData.role)}`, "_self");
   };
 
   return (

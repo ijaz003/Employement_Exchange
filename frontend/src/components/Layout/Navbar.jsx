@@ -15,11 +15,12 @@ import {
 } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import socket from "../../utils/socket";
 import { addNotification, storeNotifications } from "../../store/NotificationReducer";
 
 const Navbar = () => {
+  const axios = useAxios();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
@@ -32,7 +33,7 @@ const Navbar = () => {
     // Fetch initial unread count on mount
     const fetchUnreadCount = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/notifications", { withCredentials: true });
+        const res = await axios.get("/notifications");
         dispatch(storeNotifications(res.data.unreadCount || 0));
       } catch (err) {
         // Optionally handle error
@@ -50,9 +51,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/auth/logout", {
-        withCredentials: true,
-      });
+      const response = await axios.get("/auth/logout");
       socket.disconnect();
       toast.success(response.data.message);
       dispatch(setIsAuthorized(false));
@@ -65,7 +64,7 @@ const Navbar = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.open("http://localhost:4000/auth/google", "_self");
+  window.open(`${import.meta.env.VITE_BACKEND_URL}/auth/google`, "_self");
   };
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -103,12 +102,16 @@ const Navbar = () => {
               >
                 Home
               </Link>
+
+              {isAuthorized && (
               <Link
                 to="/jobs"
                 className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Jobs
               </Link>
+              )}
+              
               {isAuthorized && user?.role === "Employer" && (
                 <Link
                   to="/post-job"

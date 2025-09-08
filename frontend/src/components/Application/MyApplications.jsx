@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import ResumeModal from "./ResumeModal";
@@ -12,6 +12,7 @@ const MyApplications = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [resumeImageUrl, setResumeImageUrl] = useState("");
   const navigate = useNavigate();
+  const axios = useAxios();
 
 
   useEffect(() => {
@@ -38,9 +39,9 @@ const MyApplications = () => {
       try {
         let url =
           user && user.role === "Employer"
-            ? "http://localhost:4000/application/employer/getall"
-            : "http://localhost:4000/application/jobseeker/getall";
-        const res = await axios.get(url, { withCredentials: true });
+            ? "/application/employer/getall"
+            : "/application/jobseeker/getall";
+        const res = await axios.get(url);
         setApplications(res.data.applications);
       } catch (error) {
         toast.error(
@@ -54,10 +55,7 @@ const MyApplications = () => {
 
   const deleteApplication = async (id) => {
     try {
-      const res = await axios.delete(
-        `http://localhost:4000/application/delete/${id}`,
-        { withCredentials: true }
-      );
+      const res = await axios.delete(`/application/delete/${id}`);
       toast.success(res.data.message);
       setApplications((prevApplication) =>
         prevApplication.filter((application) => application._id !== id)

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { 
@@ -16,6 +16,7 @@ import { IoMdTime } from "react-icons/io";
 import socket from "../../utils/socket";
 
 const Jobs = () => {
+  const axios = useAxios();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -42,9 +43,7 @@ const Jobs = () => {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:4000/job/getall?page=${page}&limit=${limit}`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(`/job/getall?page=${page}&limit=${limit}`);
         if(response.data.success) {
           setJobs(response.data.jobs);
           setTotalPages(response.data.totalPages || 1);

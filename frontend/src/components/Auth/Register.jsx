@@ -7,10 +7,11 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiHome, FiBriefcase } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 
 
 const Register = () => {
+  const axios = useAxios();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -47,13 +48,12 @@ const Register = () => {
     setIsLoading(true);
     try {
       const { data } = await axios.post(
-        "http://localhost:4000/auth/register",
+        "/auth/register",
         formData,
         {
           headers: {
             "Content-Type": "application/json",
           },
-          withCredentials: true,
         }
       );
       toast.success(data.message);
