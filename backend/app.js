@@ -16,6 +16,7 @@ import http from "http";
 import {Server} from "socket.io";
 config({ path: "./config/config.env" });
 import NotificationRouter from "./routes/notificationRoutes.js";
+import StatsRouter from "./routes/statsRoutes.js";
 
 
 const app = express();
@@ -91,6 +92,7 @@ app.use("/job", jobRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/application", applicationRouter);
 app.use("/payment", paymentRouter);
+app.use("/stats", StatsRouter);
 
 
 

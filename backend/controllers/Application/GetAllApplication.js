@@ -11,7 +11,7 @@ import { Application } from "../../models/applicationSchema.js";
     });
   }
 
-  const applications = await Application.find({ "employerID.user": _id });
+  const applications = await Application.find({ "employerID.user": _id }).sort({ createdAt: 1 });
 
   res.status(200).json({
     applications,

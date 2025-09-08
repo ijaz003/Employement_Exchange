@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import useAxios from "../../hooks/useAxios";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { 
@@ -14,12 +14,16 @@ import {
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import socket from "../../utils/socket";
+import { useLocation } from "react-router-dom";
 
 const Jobs = () => {
-  const axios = useAxios();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const searchQuery = params.get("search") || "";
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchQuery);
   const [category, setCategory] = useState("");
   const [country, setCountry] = useState("");
   const [salaryMin, setSalaryMin] = useState("");
@@ -28,6 +32,10 @@ const Jobs = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit] = useState(9);
+
+  useEffect(() => {
+    setSearch(searchQuery);
+  }, [searchQuery]);
 
   useEffect(() => {
     socket.on("newJobPosted", (job) => {
@@ -43,7 +51,9 @@ const Jobs = () => {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/job/getall?page=${page}&limit=${limit}`);
+        const response = await axios.get(`http://localhost:4000/job/getall?page=${page}&limit=${limit}`, {
+          withCredentials: true,
+        });
         if(response.data.success) {
           setJobs(response.data.jobs);
           setTotalPages(response.data.totalPages || 1);

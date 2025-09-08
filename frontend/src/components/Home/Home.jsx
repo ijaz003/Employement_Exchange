@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import HeroSection from "./HeroSection";
 import HowItWorks from "./HowItWorks";
 import PopularCategories from "./PopularCategories";
-import PopularCompanies from "./PopularCompanies";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser, setIsAuthorized } from "../../store/UserReducers";
 import { useNavigate } from "react-router-dom";
@@ -54,7 +53,6 @@ useEffect(() => {
       <HeroSection />
       <HowItWorks />
       <PopularCategories />
-      <PopularCompanies />
     </main>
   );
 };

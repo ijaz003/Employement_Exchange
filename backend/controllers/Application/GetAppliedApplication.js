@@ -10,7 +10,7 @@ const jobseekerGetAllApplications = async (req, res) => {
       });
     }
 
-    const applications = await Application.find({ "applicantID.user": _id });
+  const applications = await Application.find({ "applicantID.user": _id }).sort({ createdAt: 1 });
 
     res.status(200).json({
       applications,

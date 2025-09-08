@@ -56,6 +56,6 @@ const applicationSchema = new mongoose.Schema({
       required: true,
     },
   },
-});
+}, { timestamps: true });
 
 export const Application = mongoose.model("Application", applicationSchema);
