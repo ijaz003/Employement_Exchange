@@ -16,38 +16,34 @@ import http from "http";
 import {Server} from "socket.io";
 config({ path: "./config/config.env" });
 import NotificationRouter from "./routes/notificationRoutes.js";
-import StatsRouter from "./routes/statsRoutes.js";
 
 
 const app = express();
 const server=http.createServer(app);
 const io = new Server(server,{
   cors: {
-    origin: process.env.FRONTEND_URL,  // e.g. "http://localhost:5173"
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-// Map to store userId <-> socketId
+
 const userSocketMap = {};
 dbConnection();
 
 io.on("connection",(socket)=>{
-  console.log("New client connected",userSocketMap);
   socket.on("registerUser",(userId)=>{
     userSocketMap[userId._id] = socket.id;
-    console.log("User registered",{userId,socketId:socket.id});
   });
   socket.on("disconnect", () => {
-    // Remove user from map on disconnect
+    
     for (const [userId, id] of Object.entries(userSocketMap)) {
       if (id === socket.id) {
         delete userSocketMap[userId];
         break;
       }
     }
-    console.log("Client disconnected",socket.id);
   });
 });
 
@@ -92,7 +88,6 @@ app.use("/job", jobRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/application", applicationRouter);
 app.use("/payment", paymentRouter);
-app.use("/stats", StatsRouter);
 
 
 

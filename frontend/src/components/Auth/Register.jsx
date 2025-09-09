@@ -38,7 +38,6 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData)
     
     // if (!role || !name || !email || !phone || !password) {
     //   toast.error("Please fill in all fields");

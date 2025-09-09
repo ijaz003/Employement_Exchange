@@ -11,7 +11,6 @@ import {io} from "../../app.js";
 });
   try {
     const { email, password, role } = req.body;
-    console.log(req.body,"data by signin")
 
     const missingFields = [];
     if (!email) missingFields.push("Email");
@@ -30,7 +29,6 @@ import {io} from "../../app.js";
 
 
     const user = await User.findOne({ email }).select("+password");
-    console.log("user", user);
     if (!user) {
       return res.status(401).json({message: "User not found!"});
     }

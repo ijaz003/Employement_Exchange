@@ -18,7 +18,6 @@ const MyApplications = () => {
   useEffect(() => {
     
       socket.on("jobApplied", (data) => {
-        console.log("New job application received:", data);
         setApplications((prevApps) => [...prevApps, data]);
         // You can update state/UI here
       });

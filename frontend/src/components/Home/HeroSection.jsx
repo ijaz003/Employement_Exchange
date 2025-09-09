@@ -3,24 +3,54 @@ import React from "react";
 import { FiSearch, FiBriefcase, FiUsers, FiTrendingUp } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import useAxios from "../../hooks/useAxios";
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from "../../contexts/ThemeContext";
+
+function useCounter(target, duration = 1200) {
+  const [count, setCount] = React.useState(0);
+  React.useEffect(() => {
+    let start = 0;
+    const end = typeof target === "number" ? target : 0;
+    if (end === 0) {
+      setCount(0);
+      return;
+    }
+    const increment = end / (duration / 16);
+    let current = start;
+    const step = () => {
+      current += increment;
+      if (current < end) {
+        setCount(Math.floor(current));
+        requestAnimationFrame(step);
+      } else {
+        setCount(end);
+      }
+    };
+    step();
+  }, [target, duration]);
+  return count;
+}
 
 const HeroSection = () => {
   const axios = useAxios();
   // Search bar state and handler
   const [search, setSearch] = React.useState("");
-  const { isAuthorized } = useSelector((state) => state.user);
-  const [stats, setStats] = React.useState({ totalJobs: 0, totalEmployers: 0, totalJobSeekers: 0 });
+  const { isAuthorized, user } = useSelector((state) => state.user);
+  const [stats, setStats] = React.useState({
+    totalJobs: 0,
+    totalEmployers: 0,
+    totalJobSeekers: 0,
+  });
   const { isDark } = useTheme();
 
   React.useEffect(() => {
-    axios.get("/stats/get")
-      .then(res => {
+    axios
+      .get("/stats/get")
+      .then((res) => {
         if (res.data.success) {
           setStats({
             totalJobs: res.data.totalJobs,
             totalEmployers: res.data.totalEmployers,
-            totalJobSeekers: res.data.totalJobSeekers
+            totalJobSeekers: res.data.totalJobSeekers,
           });
         }
       })
@@ -33,125 +63,171 @@ const HeroSection = () => {
     }
   };
 
+  const jobsCount = useCounter(stats.totalJobs);
+  const seekersCount = useCounter(stats.totalJobSeekers);
+  const employersCount = useCounter(stats.totalEmployers);
+
   return (
     <section
       className={`relative overflow-hidden transition-colors duration-300 ${
         isDark
-          ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700'
-          : 'bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800'
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700"
+          : "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800"
       }`}
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 pointer-events-none select-none">
         <div
-          className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.2%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] ${isDark ? 'bg-gray-900' : ''}`}
+          className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.2%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] ${
+            isDark ? "bg-gray-900" : ""
+          }`}
         />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-  <div className="text-center">
+        <div className="text-center">
           {/* Main Heading */}
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in">
-            <span className={
-              `block ${isDark ? 'text-primary-300' : 'text-blue-200'} animate-gradient`
-            }>
+            <span
+              className={`block ${
+                isDark ? "text-primary-300" : "text-blue-200"
+              } animate-gradient`}
+            >
               Find Your Dream Job or
             </span>
-            <span className={
-              `block ${isDark ? 'text-primary-200' : 'text-blue-100'} animate-gradient`
-            }>
+            <span
+              className={`block ${
+                isDark ? "text-primary-200" : "text-blue-100"
+              } animate-gradient`}
+            >
               Hire the Perfect Candidate
             </span>
           </h1>
           {/* Subtitle */}
           <p className="text-2xl md:text-3xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed animate-fade-in delay-100">
-            <span className={isDark ? 'text-primary-400' : 'text-blue-100'}>
-              Connect with top employers and talented professionals. Whether you&apos;re looking for your next career move or building your dream team, we&apos;ve got you covered.
+            <span className={isDark ? "text-primary-400" : "text-blue-100"}>
+              Connect with top employers and talented professionals. Whether
+              you&apos;re looking for your next career move or building your
+              dream team, we&apos;ve got you covered.
             </span>
           </p>
 
           {/* Search Bar */}
           {isAuthorized && (
-          <div>
-            <div className="max-w-2xl mx-auto mb-14 animate-fade-in delay-200">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FiSearch className="h-6 w-6 text-gray-400" />
+            <div>
+              <div className="max-w-2xl mx-auto mb-14 animate-fade-in delay-200">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <FiSearch className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    placeholder="Search for jobs, companies, or skills..."
+                    className={`w-full pl-12 pr-4 py-4 text-lg rounded-lg shadow-xl focus:outline-none focus:ring-2 transition-all duration-200 ${
+                      isDark
+                        ? "bg-gray-900 text-gray-100 placeholder-gray-400 focus:ring-primary-500"
+                        : "bg-white text-gray-900 placeholder-gray-500 focus:ring-blue-400"
+                    }`}
+                  />
+                  <button
+                    className={`absolute inset-y-0 right-0 px-6 font-semibold rounded-r-lg transition-colors ${
+                      isDark
+                        ? "bg-primary-600 text-white hover:bg-primary-700"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
+                    onClick={handleSearch}
+                  >
+                    Search
+                  </button>
                 </div>
-                <input
-                  type="text"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                  placeholder="Search for jobs, companies, or skills..."
-                  className={`w-full pl-12 pr-4 py-4 text-lg rounded-lg shadow-xl focus:outline-none focus:ring-2 transition-all duration-200 ${
+              </div>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 animate-fade-in delay-300">
+                <Link
+                  to="/jobs"
+                  className={`px-10 py-5 font-bold rounded-xl transition-colors shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200 text-lg ${
                     isDark
-                      ? 'bg-gray-900 text-gray-100 placeholder-gray-400 focus:ring-primary-500'
-                      : 'bg-white text-gray-900 placeholder-gray-500 focus:ring-blue-400'
+                      ? "bg-gray-900 text-primary-400 hover:bg-gray-800"
+                      : "bg-white text-blue-700 hover:bg-gray-50"
                   }`}
-                />
-                <button
-                  className={`absolute inset-y-0 right-0 px-6 font-semibold rounded-r-lg transition-colors ${
-                    isDark
-                      ? 'bg-primary-600 text-white hover:bg-primary-700'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                  onClick={handleSearch}
                 >
-                  Search
-                </button>
+                  Browse Jobs
+                </Link>
+                {user?.role == "Employer" ? (
+                  <Link
+                    to="/post-job"
+                    className={`px-10 py-5 bg-transparent border-2 font-bold rounded-xl transition-colors shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200 text-lg ${
+                      isDark
+                        ? "border-primary-400 text-primary-400 hover:bg-primary-400 hover:text-gray-900"
+                        : "border-white text-white hover:bg-white hover:text-blue-700"
+                    }`}
+                  >
+                    Post a Job
+                  </Link>
+                ) : (
+                  <Link
+                    to="/my-applications"
+                    className={`px-10 py-5 bg-transparent border-2 font-bold rounded-xl transition-colors shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200 text-lg ${
+                      isDark
+                        ? "border-primary-400 text-primary-400 hover:bg-primary-400 hover:text-gray-900"
+                        : "border-white text-white hover:bg-white hover:text-blue-700"
+                    }`}
+                  >
+                    My Applications
+                  </Link>
+                )}
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 animate-fade-in delay-300">
-            <Link
-              to="/jobs"
-              className={`px-10 py-5 font-bold rounded-xl transition-colors shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200 text-lg ${
-                isDark
-                  ? 'bg-gray-900 text-primary-400 hover:bg-gray-800'
-                  : 'bg-white text-blue-700 hover:bg-gray-50'
-              }`}
-            >
-              Browse Jobs
-            </Link>
-            <Link
-              to="/post-job"
-              className={`px-10 py-5 bg-transparent border-2 font-bold rounded-xl transition-colors shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200 text-lg ${
-                isDark
-                  ? 'border-primary-400 text-primary-400 hover:bg-primary-400 hover:text-gray-900'
-                  : 'border-white text-white hover:bg-white hover:text-blue-700'
-              }`}
-            >
-              Post a Job
-            </Link>
-          </div>
-          </div>
-
-)}
-
-          
+          )}
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-4xl mx-auto animate-fade-in delay-400">
             <div className="text-center">
               <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg animate-bounce-slow">
-                <FiBriefcase className={`h-10 w-10 ${isDark ? 'text-primary-400' : 'text-white'}`} />
+                <FiBriefcase
+                  className={`h-10 w-10 ${
+                    isDark ? "text-primary-400" : "text-white"
+                  }`}
+                />
               </div>
-              <h3 className="text-4xl font-extrabold text-white mb-2">{stats.totalJobs}</h3>
-              <p className={isDark ? 'text-primary-300' : 'text-blue-100'}>Active Jobs</p>
+              <h3 className="text-4xl font-extrabold text-white mb-2">
+                {jobsCount}
+              </h3>
+              <p className={isDark ? "text-primary-300" : "text-blue-100"}>
+                Active Jobs
+              </p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg animate-bounce-slow delay-100">
-                <FiUsers className={`h-10 w-10 ${isDark ? 'text-primary-400' : 'text-white'}`} />
+                <FiUsers
+                  className={`h-10 w-10 ${
+                    isDark ? "text-primary-400" : "text-white"
+                  }`}
+                />
               </div>
-              <h3 className="text-4xl font-extrabold text-white mb-2">{stats.totalJobSeekers}</h3>
-              <p className={isDark ? 'text-primary-300' : 'text-blue-100'}>Job Seekers</p>
+              <h3 className="text-4xl font-extrabold text-white mb-2">
+                {seekersCount}
+              </h3>
+              <p className={isDark ? "text-primary-300" : "text-blue-100"}>
+                Job Seekers
+              </p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg animate-bounce-slow delay-200">
-                <FiTrendingUp className={`h-10 w-10 ${isDark ? 'text-primary-400' : 'text-white'}`} />
+                <FiTrendingUp
+                  className={`h-10 w-10 ${
+                    isDark ? "text-primary-400" : "text-white"
+                  }`}
+                />
               </div>
-              <h3 className="text-4xl font-extrabold text-white mb-2">{stats.totalEmployers}</h3>
-              <p className={isDark ? 'text-primary-300' : 'text-blue-100'}>Employers</p>
+              <h3 className="text-4xl font-extrabold text-white mb-2">
+                {employersCount}
+              </h3>
+              <p className={isDark ? "text-primary-300" : "text-blue-100"}>
+                Employers
+              </p>
             </div>
           </div>
         </div>

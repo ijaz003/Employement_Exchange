@@ -16,7 +16,6 @@ import MyApplications from "./components/Application/MyApplications";
 import MyJobs from "./components/Job/MyJobs";
 import NotFound from "./components/NotFound/NotFound";
 import Profile from "./components/Profile/Profile";
-import ResumeUpload from "./components/Profile/ResumeUpload";
 import BuyPlan from "./components/BuyPlan";
 import Success from "./components/Success";
 import ProtectedRoute from "./components/Middleware/ProtectedRoute";
@@ -112,7 +111,6 @@ function App() {
                 }
               />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/resume-upload" element={<ResumeUpload />} />
               <Route path="/plane" element={<BuyPlan />} />
               <Route
                 path="/success"

@@ -90,7 +90,6 @@ const postApplication = async (req, res) => {
     });
     io.to(employerSocketId).emit("notification", notification);
     io.to(employerSocketId).emit("newNotification",  notification );
-    console.log(notification, "Notification data");
   }
 
   res.status(201).json({

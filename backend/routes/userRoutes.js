@@ -35,7 +35,6 @@ router.get('/google/callback',
     const user = req.user.user;
     const token = req.user.token;
 
-    console.log("before redirecting to success", user);
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

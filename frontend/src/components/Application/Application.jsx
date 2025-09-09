@@ -22,7 +22,6 @@ const Application = () => {
   };
 
   const { jobId } = useParams();
-  console.log(jobId, "Job ID from URL params");
 
   const handleApplication = async (e) => {
     e.preventDefault();

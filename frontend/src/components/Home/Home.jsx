@@ -16,7 +16,6 @@ const Home = () => {
 
 useEffect(() => {
     socket.on("jobApplied", (data) => {
-      console.log("New job application received:", data);
       // You can update state/UI here
     });
 
@@ -47,7 +46,6 @@ useEffect(() => {
       }
     }
   }, []);
-  console.log(user,"After payment")
   return (
     <main>
       <HeroSection />

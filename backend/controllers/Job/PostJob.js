@@ -76,7 +76,6 @@ const postJob = async (req, res) => {
         });
         io.emit("notification", notification);
         io.emit("newNotification", { notification });
-        console.log(notification, "Notification data");
     res.status(201).json({
       success: true,
       message: "Job posted successfully!",

@@ -30,7 +30,6 @@ const register = async (req, res) => {
         }
 
         const hashPassword = await bcrypt.hash(password, 10);
-        // console.log("hashPassword", hashPassword);
 
         const user = await User.create({
             name,

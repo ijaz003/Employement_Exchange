@@ -10,12 +10,9 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setIsAuthorized: (state, action) => {
-            console.log("Setting isAuthorized to:", action.payload);
             state.isAuthorized = action.payload;
-            console.log("Updated isAuthorized:", state.isAuthorized);
         },
         setUser: (state, action) => {
-            console.log()
             state.user = action.payload;
             
         },

@@ -3,7 +3,6 @@ export const sendToken = (user, res, message) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
   });
-  console.log("token", token);
   
   
   const options = {

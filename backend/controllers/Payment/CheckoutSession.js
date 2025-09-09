@@ -5,7 +5,6 @@ const stripe = new Stripe(process.env.Secret_Key);
 const CheckoutSession = async (req,res) => {
 
     const { role, _id } = req.user;
-    console.log(role, _id);
     try {
         const { priceId } = req.body;
         if (!priceId) {
@@ -29,7 +28,6 @@ const CheckoutSession = async (req,res) => {
         try {
             const { User } = await import("../../models/userSchema.js");
             await User.updateOne({ _id }, { session_id: session.id });
-            console.log("Saved session_id to user:", User);
         } catch (dbError) {
             console.error("Error saving session_id to user:", dbError);
         }

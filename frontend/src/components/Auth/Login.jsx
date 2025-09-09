@@ -34,7 +34,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData)
     setIsLoading(true);
     try {
       const { data } = await axios.post(
@@ -61,7 +60,6 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthorized) {
-      toast.success("Login successful!");
       navigate("/");
     }
   }, [isAuthorized, navigate]);

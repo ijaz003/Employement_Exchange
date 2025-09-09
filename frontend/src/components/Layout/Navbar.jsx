@@ -70,6 +70,7 @@ const Navbar = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
 
+
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -230,16 +231,6 @@ const Navbar = () => {
                       <FiSettings className="h-4 w-4" />
                       <span>Profile</span>
                     </Link>
-                    {user?.role === "Job Seeker" && (
-                      <Link
-                        to="/resume-upload"
-                        className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <FiSettings className="h-4 w-4" />
-                        <span>Resume</span>
-                      </Link>
-                    )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center space-x-2 w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
