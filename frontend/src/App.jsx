@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
-import { Toaster } from "react-hot-toast";
 import store from "./store/store";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Navbar from "./components/Layout/Navbar";
@@ -24,6 +23,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { addNotification } from "./store/NotificationReducer";
 import Notifications from "./components/Notifications";
+import CustomToaster from "./components/CustomToaster";
 
 // home,Jobs,
 function App() {
@@ -124,23 +124,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: "#363636",
-                color: "#fff",
-              },
-              success: {
-                duration: 3000,
-                iconTheme: {
-                  primary: "#10b981",
-                  secondary: "#fff",
-                },
-              },
-            }}
-          />
+          <CustomToaster />
         </div>
       </Router>
     </ThemeProvider>

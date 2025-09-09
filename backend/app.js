@@ -3,6 +3,7 @@ import session from "express-session";
 import dbConnection  from "./database/dbConnection.js";
 import jobRouter from "./routes/jobRoutes.js";
 import userRouter from "./routes/userRoutes.js";
+import statsRouter from "./routes/statsRoutes.js";
 import applicationRouter from "./routes/applicationRoutes.js";
 import { config } from "dotenv";
 import cors from "cors";
@@ -88,6 +89,7 @@ app.use("/job", jobRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/application", applicationRouter);
 app.use("/payment", paymentRouter);
+app.use("/stats", statsRouter);
 
 
 
