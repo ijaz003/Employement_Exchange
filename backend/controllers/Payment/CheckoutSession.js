@@ -10,6 +10,7 @@ const CheckoutSession = async (req,res) => {
         if (!priceId) {
             return res.status(400).json({ message: "must provide the priceId" });
         }
+        const frontendUrl = process.env.FRONTEND_URL;
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: "subscription",
@@ -19,8 +20,8 @@ const CheckoutSession = async (req,res) => {
                     quantity: 1,
                 }
             ],
-            success_url: "http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url: "http://localhost:5173/cancel",
+            success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${frontendUrl}/cancel`,
             metadata: { userId: _id }
         });
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { 
@@ -33,6 +33,8 @@ const Jobs = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [limit] = useState(9);
 
+  const axios = useAxios();
+
   useEffect(() => {
     setSearch(searchQuery);
   }, [searchQuery]);
@@ -51,7 +53,7 @@ const Jobs = () => {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:4000/job/getall?page=${page}&limit=${limit}`, {
+        const response = await axios.get(`/job/getall?page=${page}&limit=${limit}`, {
           withCredentials: true,
         });
         if(response.data.success) {
